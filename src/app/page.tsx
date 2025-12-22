@@ -3,8 +3,8 @@
 import { useState, ReactNode } from "react";
 import { Copy, Check, Sparkles, Loader2, X } from "lucide-react";
 import { Highlight, themes } from "prism-react-renderer";
+import { useClipboard } from "@/hooks/useClipboard";
 
-const COPY_FEEDBACK_DURATION_MS = 2000;
 const PANEL_HEIGHT = "h-[calc(100vh-220px)]";
 
 interface CodePanelProps {
@@ -25,12 +25,80 @@ function CodePanel({ title, headerRight, children }: CodePanelProps) {
   );
 }
 
+interface ErrorBannerProps {
+  message: string;
+  onDismiss: () => void;
+}
+
+function ErrorBanner({ message, onDismiss }: ErrorBannerProps) {
+  return (
+    <div className="mb-4 flex items-center justify-between rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-red-400">
+      <span>{message}</span>
+      <button
+        onClick={onDismiss}
+        className="ml-4 rounded p-1 transition-colors hover:bg-red-500/20"
+        aria-label="Dismiss error"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
+interface OutputContentProps {
+  isLoading: boolean;
+  outputCode: string;
+}
+
+function OutputContent({ isLoading, outputCode }: OutputContentProps) {
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-zinc-500">
+          <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+          <span className="text-sm">Beautifying code...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (outputCode) {
+    return (
+      <Highlight theme={themes.nightOwl} code={outputCode} language="javascript">
+        {({ style, tokens, getLineProps, getTokenProps }) => (
+          <pre
+            className="h-full overflow-auto p-4 font-mono text-sm"
+            style={{ ...style, background: "transparent" }}
+          >
+            {tokens.map((line, i) => (
+              <div key={i} {...getLineProps({ line })}>
+                <span className="mr-4 inline-block w-8 text-right text-zinc-600 select-none">
+                  {i + 1}
+                </span>
+                {line.map((token, key) => (
+                  <span key={key} {...getTokenProps({ token })} />
+                ))}
+              </div>
+            ))}
+          </pre>
+        )}
+      </Highlight>
+    );
+  }
+
+  return (
+    <div className="flex h-full items-center justify-center text-zinc-600">
+      <span className="text-sm">Beautified code will appear here</span>
+    </div>
+  );
+}
+
 export default function Home() {
   const [inputCode, setInputCode] = useState("");
   const [outputCode, setOutputCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useClipboard({ onError: setError });
 
   const handleBeautify = async () => {
     if (!inputCode.trim()) {
@@ -69,21 +137,8 @@ export default function Home() {
     }
   };
 
-  const handleCopy = async () => {
-    if (!outputCode) return;
-
-    if (!navigator.clipboard) {
-      setError("Clipboard not available (requires HTTPS or localhost)");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(outputCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
-    } catch {
-      setError("Failed to copy to clipboard");
-    }
+  const handleCopy = () => {
+    if (outputCode) copy(outputCode);
   };
 
   return (
@@ -99,19 +154,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="flex flex-1 flex-col gap-4 p-6">
         <div className="mx-auto w-full max-w-7xl flex-1">
-          {/* Error Message */}
-          {error && (
-            <div className="mb-4 flex items-center justify-between rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-red-400">
-              <span>{error}</span>
-              <button
-                onClick={() => setError(null)}
-                className="ml-4 rounded p-1 transition-colors hover:bg-red-500/20"
-                aria-label="Dismiss error"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+          {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
 
           {/* Code Panels */}
           <div className={`grid ${PANEL_HEIGHT} grid-cols-1 gap-4 lg:grid-cols-2`}>
@@ -157,38 +200,7 @@ export default function Home() {
               }
             >
               <div className="relative flex-1 overflow-auto">
-                {isLoading ? (
-                  <div className="flex h-full items-center justify-center">
-                    <div className="flex flex-col items-center gap-3 text-zinc-500">
-                      <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-                      <span className="text-sm">Beautifying code...</span>
-                    </div>
-                  </div>
-                ) : outputCode ? (
-                  <Highlight theme={themes.nightOwl} code={outputCode} language="javascript">
-                    {({ style, tokens, getLineProps, getTokenProps }) => (
-                      <pre
-                        className="h-full overflow-auto p-4 font-mono text-sm"
-                        style={{ ...style, background: "transparent" }}
-                      >
-                        {tokens.map((line, i) => (
-                          <div key={i} {...getLineProps({ line })}>
-                            <span className="mr-4 inline-block w-8 text-right text-zinc-600 select-none">
-                              {i + 1}
-                            </span>
-                            {line.map((token, key) => (
-                              <span key={key} {...getTokenProps({ token })} />
-                            ))}
-                          </div>
-                        ))}
-                      </pre>
-                    )}
-                  </Highlight>
-                ) : (
-                  <div className="flex h-full items-center justify-center text-zinc-600">
-                    <span className="text-sm">Beautified code will appear here</span>
-                  </div>
-                )}
+                <OutputContent isLoading={isLoading} outputCode={outputCode} />
               </div>
             </CodePanel>
           </div>
