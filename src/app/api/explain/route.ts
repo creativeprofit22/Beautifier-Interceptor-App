@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EXPLANATION_PROMPT } from "@/lib/prompts";
-import { runClaudeCommand } from "@/lib/claude";
-
-const MAX_CODE_SIZE = 100 * 1024; // 100KB limit
-const TIMEOUT_MS = 120 * 1000; // 2 minute timeout
+import { runClaudeCommand, MAX_CODE_SIZE, TIMEOUT_MS } from "@/lib/claude";
 
 export async function POST(request: NextRequest) {
   let body;

@@ -8,6 +8,7 @@ import { useClipboard } from "@/hooks/useClipboard";
 
 type OutputTab = "code" | "explanation";
 
+// 220px = header (73px) + main padding (48px) + error banner space (55px) + button area (44px)
 const PANEL_HEIGHT = "h-[calc(100vh-220px)]";
 
 interface CodePanelProps {
@@ -48,6 +49,182 @@ function ErrorBanner({ message, onDismiss }: ErrorBannerProps) {
   );
 }
 
+interface LoadingSpinnerProps {
+  message: string;
+}
+
+function LoadingSpinner({ message }: LoadingSpinnerProps) {
+  return (
+    <div className="flex h-full items-center justify-center">
+      <div className="flex flex-col items-center gap-3 text-zinc-500">
+        <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+        <span className="text-sm">{message}</span>
+      </div>
+    </div>
+  );
+}
+
+interface TabButtonProps {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+function TabButton({ label, isActive, onClick }: TabButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+        isActive
+          ? "bg-zinc-800 text-zinc-100"
+          : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+interface ActionButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+  icon: ReactNode;
+  label: string;
+  isLoading?: boolean;
+  loadingLabel?: string;
+  isActive?: boolean;
+  activeIcon?: ReactNode;
+  activeLabel?: string;
+  activeClassName?: string;
+}
+
+const actionButtonStyles = [
+  "flex items-center gap-1.5 rounded-md px-2.5 py-1.5",
+  "text-xs font-medium text-zinc-400 transition-colors",
+  "hover:bg-zinc-800 hover:text-zinc-200",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+  "disabled:hover:bg-transparent disabled:hover:text-zinc-400",
+].join(" ");
+
+function ActionButton({
+  onClick,
+  disabled,
+  icon,
+  label,
+  isLoading,
+  loadingLabel,
+  isActive,
+  activeIcon,
+  activeLabel,
+  activeClassName = "",
+}: ActionButtonProps) {
+  const renderContent = () => {
+    if (isLoading && loadingLabel) {
+      return (
+        <>
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <span>{loadingLabel}</span>
+        </>
+      );
+    }
+
+    if (isActive && activeIcon && activeLabel) {
+      return (
+        <>
+          {activeIcon}
+          <span className={activeClassName}>{activeLabel}</span>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {icon}
+        <span>{label}</span>
+      </>
+    );
+  };
+
+  return (
+    <button onClick={onClick} disabled={disabled} className={actionButtonStyles}>
+      {renderContent()}
+    </button>
+  );
+}
+
+interface OutputPanelProps {
+  activeTab: OutputTab;
+  onTabChange: (tab: OutputTab) => void;
+  isLoading: boolean;
+  isExplaining: boolean;
+  outputCode: string;
+  explanation: string;
+  onExplain: () => void;
+  onCopy: () => void;
+  copied: boolean;
+}
+
+function OutputPanel({
+  activeTab,
+  onTabChange,
+  isLoading,
+  isExplaining,
+  outputCode,
+  explanation,
+  onExplain,
+  onCopy,
+  copied,
+}: OutputPanelProps) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+      <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+        {/* Tabs */}
+        <div className="flex gap-1">
+          <TabButton
+            label="Code"
+            isActive={activeTab === "code"}
+            onClick={() => onTabChange("code")}
+          />
+          <TabButton
+            label="Explanation"
+            isActive={activeTab === "explanation"}
+            onClick={() => onTabChange("explanation")}
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <ActionButton
+            onClick={onExplain}
+            disabled={!outputCode || isLoading || isExplaining}
+            icon={<MessageSquareText className="h-3.5 w-3.5" />}
+            label="Explain"
+            isLoading={isExplaining}
+            loadingLabel="Analyzing..."
+          />
+          <ActionButton
+            onClick={onCopy}
+            disabled={!outputCode}
+            icon={<Copy className="h-3.5 w-3.5" />}
+            label="Copy"
+            isActive={copied}
+            activeIcon={<Check className="h-3.5 w-3.5 text-green-500" />}
+            activeLabel="Copied!"
+            activeClassName="text-green-500"
+          />
+        </div>
+      </div>
+      <div className="relative flex-1 overflow-auto">
+        {activeTab === "code" ? (
+          <OutputContent isLoading={isLoading} outputCode={outputCode} />
+        ) : (
+          <ExplanationContent isLoading={isExplaining} explanation={explanation} />
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface OutputContentProps {
   isLoading: boolean;
   outputCode: string;
@@ -55,14 +232,7 @@ interface OutputContentProps {
 
 function OutputContent({ isLoading, outputCode }: OutputContentProps) {
   if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-zinc-500">
-          <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-          <span className="text-sm">Beautifying code...</span>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Beautifying code..." />;
   }
 
   if (outputCode) {
@@ -103,19 +273,12 @@ interface ExplanationContentProps {
 
 function ExplanationContent({ isLoading, explanation }: ExplanationContentProps) {
   if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-zinc-500">
-          <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-          <span className="text-sm">Analyzing code...</span>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Analyzing code..." />;
   }
 
   if (explanation) {
     return (
-      <div className="prose prose-invert prose-sm max-w-none overflow-auto p-4 prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-code:text-violet-400 prose-a:text-violet-400 prose-li:text-zinc-300">
+      <div className="prose prose-invert prose-sm prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-code:text-violet-400 prose-a:text-violet-400 prose-li:text-zinc-300 max-w-none overflow-auto p-4">
         <ReactMarkdown>{explanation}</ReactMarkdown>
       </div>
     );
@@ -126,6 +289,31 @@ function ExplanationContent({ isLoading, explanation }: ExplanationContentProps)
       <span className="text-sm">Click &quot;Explain&quot; to analyze the code</span>
     </div>
   );
+}
+
+async function apiCall<T>(
+  url: string,
+  body: object,
+  resultField: string,
+  errorMessage: string
+): Promise<T> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(data?.error || errorMessage);
+  }
+
+  if (!data?.[resultField]) {
+    throw new Error("Invalid response from server");
+  }
+
+  return data[resultField];
 }
 
 export default function Home() {
@@ -151,25 +339,13 @@ export default function Home() {
     setActiveTab("code");
 
     try {
-      const response = await fetch("/api/beautify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: inputCode }),
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Failed to beautify code");
-      }
-
-      if (!data?.result) {
-        throw new Error("Invalid response from server");
-      }
-
-      setOutputCode(data.result);
+      const result = await apiCall<string>(
+        "/api/beautify",
+        { code: inputCode },
+        "result",
+        "Failed to beautify code"
+      );
+      setOutputCode(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -190,25 +366,13 @@ export default function Home() {
     setError(null);
 
     try {
-      const response = await fetch("/api/explain", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: outputCode }),
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Failed to explain code");
-      }
-
-      if (!data?.explanation) {
-        throw new Error("Invalid response from server");
-      }
-
-      setExplanation(data.explanation);
+      const result = await apiCall<string>(
+        "/api/explain",
+        { code: outputCode },
+        "explanation",
+        "Failed to explain code"
+      );
+      setExplanation(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       setActiveTab("code");
@@ -253,78 +417,17 @@ export default function Home() {
             </CodePanel>
 
             {/* Output Panel */}
-            <div className="flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-              <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
-                {/* Tabs */}
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setActiveTab("code")}
-                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                      activeTab === "code"
-                        ? "bg-zinc-800 text-zinc-100"
-                        : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
-                    }`}
-                  >
-                    Code
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("explanation")}
-                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                      activeTab === "explanation"
-                        ? "bg-zinc-800 text-zinc-100"
-                        : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
-                    }`}
-                  >
-                    Explanation
-                  </button>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleExplain}
-                    disabled={!outputCode || isLoading || isExplaining}
-                    className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-zinc-400"
-                  >
-                    {isExplaining ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        <span>Analyzing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <MessageSquareText className="h-3.5 w-3.5" />
-                        <span>Explain</span>
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleCopy}
-                    disabled={!outputCode}
-                    className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-zinc-400"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="h-3.5 w-3.5 text-green-500" />
-                        <span className="text-green-500">Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" />
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-              <div className="relative flex-1 overflow-auto">
-                {activeTab === "code" ? (
-                  <OutputContent isLoading={isLoading} outputCode={outputCode} />
-                ) : (
-                  <ExplanationContent isLoading={isExplaining} explanation={explanation} />
-                )}
-              </div>
-            </div>
+            <OutputPanel
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              isLoading={isLoading}
+              isExplaining={isExplaining}
+              outputCode={outputCode}
+              explanation={explanation}
+              onExplain={handleExplain}
+              onCopy={handleCopy}
+              copied={copied}
+            />
           </div>
 
           {/* Beautify Button */}

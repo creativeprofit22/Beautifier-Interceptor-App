@@ -3,24 +3,24 @@
 Local web app that beautifies/deobfuscates JavaScript using Claude CLI.
 
 ## Current Focus
-Feature: Code Beautifier MVP
-Files: src/app/page.tsx, src/app/api/beautify/route.ts
+Feature: Explain feature
+Files: src/app/page.tsx, src/app/api/explain/route.ts
 
 ## Pipeline State
 Phase: refactoring
-Feature: Code Beautifier MVP
+Feature: Explain feature
 Tier: low
 Tier-Status: pending
 Reports:
-  - bugs: reports/bugs-code-beautifier-mvp.md
-  - refactors: reports/refactors-code-beautifier-mvp.md
+  - bugs: reports/bugs-explain-feature.md
+  - refactors: reports/refactors-explain-feature.md
 
 ## Last Session (2025-12-22)
-- Completed medium priority refactors (2 items)
-- Extracted `OutputContent` component (replaces nested ternary)
-- Extracted `ErrorBanner` component (reduces Home component size)
-- Home component reduced from 190+ to ~140 lines
+- Completed all 3 medium priority refactors:
+  - Extracted `ActionButton` component with loading/active state support
+  - Extracted `OutputPanel` component (reduced Home component by ~50 lines)
+  - Extracted `apiCall<T>()` utility for common fetch logic
 - Build passes
 
 ## Next Steps
-1. Execute low priority refactors (2 remaining) or skip to mark MVP complete
+1. Execute low priority refactors (2 items)

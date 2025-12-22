@@ -1,5 +1,8 @@
 import { spawn } from "child_process";
 
+export const MAX_CODE_SIZE = 100 * 1024; // 100KB limit
+export const TIMEOUT_MS = 120 * 1000; // 2 minute timeout
+
 export function runClaudeCommand(prompt: string, input: string, timeout: number): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn("claude", ["-p", prompt], {
