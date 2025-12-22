@@ -7,17 +7,20 @@ Feature: Code Beautifier MVP
 Files: src/app/page.tsx, src/app/api/beautify/route.ts
 
 ## Pipeline State
-Phase: build
+Phase: refactoring
 Feature: Code Beautifier MVP
+Tier: low
+Tier-Status: pending
 Reports:
   - bugs: reports/bugs-code-beautifier-mvp.md
   - refactors: reports/refactors-code-beautifier-mvp.md
 
 ## Last Session (2025-12-22)
-Low priority refactors complete - pipeline finished:
-- Extracted `COPY_FEEDBACK_DURATION_MS` constant (page.tsx:7)
-- Extracted `PANEL_HEIGHT` constant for calc height (page.tsx:8)
-- All 5 refactors done (1 High, 2 Medium, 2 Low)
+- Completed medium priority refactors (2 items)
+- Extracted `OutputContent` component (replaces nested ternary)
+- Extracted `ErrorBanner` component (reduces Home component size)
+- Home component reduced from 190+ to ~140 lines
+- Build passes
 
 ## Next Steps
-1. Awaiting user task
+1. Execute low priority refactors (2 remaining) or skip to mark MVP complete
