@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BEAUTIFY_PROMPT } from "@/lib/prompts";
+import { getBeautifyPrompt } from "@/lib/prompts";
 import { runClaudeCommand } from "@/lib/claude";
+import { processCodeWithSourceMap } from "@/lib/source-map";
+import { stripMarkdownFences } from "@/lib/utils";
 
 const MAX_CODE_SIZE = 100 * 1024; // 100KB limit
 const TIMEOUT_MS = 120 * 1000; // 2 minute timeout
-
-function stripMarkdownFences(output: string): string {
-  // Extract code from markdown fences, even if surrounded by explanatory text
-  // Handles cases with or without newline after opening fence
-  const fencePattern = /```(?:javascript|js|typescript|ts)?[ \t]*\n?([\s\S]*?)```/;
-  const match = output.match(fencePattern);
-  return match ? match[1].trim() : output.trim();
-}
 
 export async function POST(request: NextRequest) {
   let body;
@@ -35,10 +29,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const rawResult = await runClaudeCommand(BEAUTIFY_PROMPT, code, TIMEOUT_MS);
+    // Detect and parse inline source map
+    const sourceMapResult = await processCodeWithSourceMap(code);
+
+    // Build prompt with variable hints if available
+    const prompt = getBeautifyPrompt(sourceMapResult.variableHints);
+
+    const rawResult = await runClaudeCommand(prompt, code, TIMEOUT_MS);
     const result = stripMarkdownFences(rawResult);
 
-    return NextResponse.json({ result });
+    return NextResponse.json({
+      result,
+      sourceMapDetected: sourceMapResult.hasSourceMap,
+      externalSourceMapUrl: sourceMapResult.externalSourceMapUrl,
+    });
   } catch (error) {
     console.error("Beautify error:", error);
     return NextResponse.json(

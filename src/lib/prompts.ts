@@ -8,6 +8,29 @@ RULES:
 
 CRITICAL: Your response must start with code and contain ONLY code. Never ask questions or add explanations.`;
 
+const VARIABLE_MAPPING_FORMAT = (minified: string, original: string) => `- ${minified} → ${original}`;
+
+/**
+ * Get the beautify prompt with optional source map variable hints
+ * @param variableHints - Optional mapping of minified names to original names from source map
+ * @returns The beautify prompt, optionally augmented with variable mappings
+ */
+export function getBeautifyPrompt(variableHints?: Record<string, string>): string {
+  if (!variableHints || Object.keys(variableHints).length === 0) {
+    return BEAUTIFY_PROMPT;
+  }
+
+  const mappingLines = Object.entries(variableHints)
+    .map(([minified, original]) => VARIABLE_MAPPING_FORMAT(minified, original))
+    .join('\n');
+
+  return `${BEAUTIFY_PROMPT}
+
+VARIABLE MAPPING (from source map):
+The following variables have known original names. Use these exact names:
+${mappingLines}`;
+}
+
 export const EXPLANATION_PROMPT = `You are a code analyst helping developers understand JavaScript code.
 
 Analyze the provided code and explain:

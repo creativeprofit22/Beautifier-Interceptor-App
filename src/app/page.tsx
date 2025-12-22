@@ -85,6 +85,36 @@ function TabButton({ label, isActive, onClick }: TabButtonProps) {
   );
 }
 
+interface SourceMapBadgeProps {
+  detected: boolean;
+  externalUrl: string | null;
+}
+
+function SourceMapBadge({ detected, externalUrl }: SourceMapBadgeProps) {
+  if (!detected && !externalUrl) {
+    return null;
+  }
+
+  return (
+    <>
+      {detected && (
+        <span className="flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-400">
+          <Check className="h-3 w-3" />
+          Source Map
+        </span>
+      )}
+      {externalUrl && (
+        <span
+          className="max-w-48 truncate rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-400"
+          title={`External source map: ${externalUrl}`}
+        >
+          External: {externalUrl}
+        </span>
+      )}
+    </>
+  );
+}
+
 interface ActionButtonProps {
   onClick: () => void;
   disabled?: boolean;
@@ -98,13 +128,7 @@ interface ActionButtonProps {
   activeClassName?: string;
 }
 
-const actionButtonStyles = [
-  "flex items-center gap-1.5 rounded-md px-2.5 py-1.5",
-  "text-xs font-medium text-zinc-400 transition-colors",
-  "hover:bg-zinc-800 hover:text-zinc-200",
-  "disabled:cursor-not-allowed disabled:opacity-50",
-  "disabled:hover:bg-transparent disabled:hover:text-zinc-400",
-].join(" ");
+const actionButtonStyles = `flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-zinc-400`;
 
 function ActionButton({
   onClick,
@@ -162,6 +186,8 @@ interface OutputPanelProps {
   onExplain: () => void;
   onCopy: () => void;
   copied: boolean;
+  sourceMapDetected: boolean;
+  externalSourceMapUrl: string | null;
 }
 
 function OutputPanel({
@@ -174,22 +200,27 @@ function OutputPanel({
   onExplain,
   onCopy,
   copied,
+  sourceMapDetected,
+  externalSourceMapUrl,
 }: OutputPanelProps) {
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
       <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
         {/* Tabs */}
-        <div className="flex gap-1">
-          <TabButton
-            label="Code"
-            isActive={activeTab === "code"}
-            onClick={() => onTabChange("code")}
-          />
-          <TabButton
-            label="Explanation"
-            isActive={activeTab === "explanation"}
-            onClick={() => onTabChange("explanation")}
-          />
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            <TabButton
+              label="Code"
+              isActive={activeTab === "code"}
+              onClick={() => onTabChange("code")}
+            />
+            <TabButton
+              label="Explanation"
+              isActive={activeTab === "explanation"}
+              onClick={() => onTabChange("explanation")}
+            />
+          </div>
+          <SourceMapBadge detected={sourceMapDetected} externalUrl={externalSourceMapUrl} />
         </div>
 
         {/* Actions */}
@@ -294,7 +325,7 @@ function ExplanationContent({ isLoading, explanation }: ExplanationContentProps)
 async function apiCall<T>(
   url: string,
   body: object,
-  resultField: string,
+  resultField: string | null,
   errorMessage: string
 ): Promise<T> {
   const response = await fetch(url, {
@@ -309,14 +340,17 @@ async function apiCall<T>(
     throw new Error(data?.error || errorMessage);
   }
 
-  if (!data?.[resultField]) {
-    throw new Error("Invalid response from server");
+  if (resultField !== null) {
+    if (!data?.[resultField]) {
+      throw new Error("Invalid response from server");
+    }
+    return data[resultField];
   }
 
-  return data[resultField];
+  return data;
 }
 
-export default function Home() {
+function useBeautifyState() {
   const [inputCode, setInputCode] = useState("");
   const [outputCode, setOutputCode] = useState("");
   const [explanation, setExplanation] = useState("");
@@ -324,7 +358,61 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExplaining, setIsExplaining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sourceMapDetected, setSourceMapDetected] = useState(false);
+  const [externalSourceMapUrl, setExternalSourceMapUrl] = useState<string | null>(null);
   const { copied, copy } = useClipboard({ onError: setError });
+
+  return {
+    // Input/Output state
+    inputCode,
+    setInputCode,
+    outputCode,
+    setOutputCode,
+    explanation,
+    setExplanation,
+    // UI state
+    activeTab,
+    setActiveTab,
+    isLoading,
+    setIsLoading,
+    isExplaining,
+    setIsExplaining,
+    error,
+    setError,
+    // Source map state
+    sourceMapDetected,
+    setSourceMapDetected,
+    externalSourceMapUrl,
+    setExternalSourceMapUrl,
+    // Clipboard
+    copied,
+    copy,
+  };
+}
+
+export default function Home() {
+  const {
+    inputCode,
+    setInputCode,
+    outputCode,
+    setOutputCode,
+    explanation,
+    setExplanation,
+    activeTab,
+    setActiveTab,
+    isLoading,
+    setIsLoading,
+    isExplaining,
+    setIsExplaining,
+    error,
+    setError,
+    sourceMapDetected,
+    setSourceMapDetected,
+    externalSourceMapUrl,
+    setExternalSourceMapUrl,
+    copied,
+    copy,
+  } = useBeautifyState();
 
   const handleBeautify = async () => {
     if (!inputCode.trim()) {
@@ -337,15 +425,30 @@ export default function Home() {
     setOutputCode("");
     setExplanation("");
     setActiveTab("code");
+    setSourceMapDetected(false);
+    setExternalSourceMapUrl(null);
 
     try {
-      const result = await apiCall<string>(
+      interface BeautifyResponse {
+        result: string;
+        sourceMapDetected?: boolean;
+        externalSourceMapUrl?: string | null;
+      }
+
+      const data = await apiCall<BeautifyResponse>(
         "/api/beautify",
         { code: inputCode },
-        "result",
+        null,
         "Failed to beautify code"
       );
-      setOutputCode(result);
+
+      if (!data.result) {
+        throw new Error("Invalid response from server");
+      }
+
+      setOutputCode(data.result);
+      setSourceMapDetected(data.sourceMapDetected ?? false);
+      setExternalSourceMapUrl(data.externalSourceMapUrl ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -427,6 +530,8 @@ export default function Home() {
               onExplain={handleExplain}
               onCopy={handleCopy}
               copied={copied}
+              sourceMapDetected={sourceMapDetected}
+              externalSourceMapUrl={externalSourceMapUrl}
             />
           </div>
 
