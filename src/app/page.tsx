@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, ReactNode } from "react";
-import { Copy, Check, Sparkles, Loader2, X, MessageSquareText } from "lucide-react";
+import { useState } from "react";
+import { Copy, Check, Sparkles, Loader2, MessageSquareText } from "lucide-react";
 import { Highlight, themes } from "prism-react-renderer";
 import ReactMarkdown from "react-markdown";
 import { useClipboard } from "@/hooks/useClipboard";
 import { apiCall } from "@/lib/api";
+import { CodePanel } from "@/components/ui/CodePanel";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { TabButton } from "@/components/ui/TabButton";
+import { SourceMapBadge } from "@/components/ui/SourceMapBadge";
+import { ActionButton } from "@/components/ui/ActionButton";
 
 type OutputTab = "code" | "explanation";
 
@@ -21,171 +27,6 @@ function getErrorMessage(err: unknown): string {
 
 // 220px = header (73px) + main padding (48px) + error banner space (55px) + button area (44px)
 const PANEL_HEIGHT = "h-[calc(100vh-220px)]";
-
-interface CodePanelProps {
-  title: string;
-  headerRight?: ReactNode;
-  children: ReactNode;
-}
-
-function CodePanel({ title, headerRight, children }: CodePanelProps) {
-  return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-      <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
-        <span className="text-sm font-medium text-zinc-400">{title}</span>
-        {headerRight}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-interface ErrorBannerProps {
-  message: string;
-  onDismiss: () => void;
-}
-
-function ErrorBanner({ message, onDismiss }: ErrorBannerProps) {
-  return (
-    <div className="mb-4 flex items-center justify-between rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-red-400">
-      <span>{message}</span>
-      <button
-        onClick={onDismiss}
-        className="ml-4 rounded p-1 transition-colors hover:bg-red-500/20"
-        aria-label="Dismiss error"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  );
-}
-
-interface LoadingSpinnerProps {
-  message: string;
-}
-
-function LoadingSpinner({ message }: LoadingSpinnerProps) {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <div className="flex flex-col items-center gap-3 text-zinc-500">
-        <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-        <span className="text-sm">{message}</span>
-      </div>
-    </div>
-  );
-}
-
-interface TabButtonProps {
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}
-
-function TabButton({ label, isActive, onClick }: TabButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-        isActive
-          ? "bg-zinc-800 text-zinc-100"
-          : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-interface SourceMapBadgeProps {
-  detected: boolean;
-  externalUrl: string | null;
-}
-
-function SourceMapBadge({ detected, externalUrl }: SourceMapBadgeProps) {
-  if (!detected && !externalUrl) {
-    return null;
-  }
-
-  return (
-    <>
-      {detected && (
-        <span className="flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-400">
-          <Check className="h-3 w-3" />
-          Source Map
-        </span>
-      )}
-      {externalUrl && (
-        <span
-          className="max-w-48 truncate rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-400"
-          title={`External source map: ${externalUrl}`}
-        >
-          External: {externalUrl}
-        </span>
-      )}
-    </>
-  );
-}
-
-interface ActionButtonProps {
-  onClick: () => void;
-  disabled?: boolean;
-  icon: ReactNode;
-  label: string;
-  isLoading?: boolean;
-  loadingLabel?: string;
-  isActive?: boolean;
-  activeIcon?: ReactNode;
-  activeLabel?: string;
-  activeClassName?: string;
-}
-
-const actionButtonStyles = `flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-zinc-400`;
-
-function ActionButton({
-  onClick,
-  disabled,
-  icon,
-  label,
-  isLoading,
-  loadingLabel,
-  isActive,
-  activeIcon,
-  activeLabel,
-  activeClassName = "",
-}: ActionButtonProps) {
-  const renderContent = () => {
-    if (isLoading && loadingLabel) {
-      return (
-        <>
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          <span>{loadingLabel}</span>
-        </>
-      );
-    }
-
-    if (isActive && activeIcon && activeLabel) {
-      return (
-        <>
-          {activeIcon}
-          <span className={activeClassName}>{activeLabel}</span>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {icon}
-        <span>{label}</span>
-      </>
-    );
-  };
-
-  return (
-    <button onClick={onClick} disabled={disabled} className={actionButtonStyles}>
-      {renderContent()}
-    </button>
-  );
-}
 
 interface OutputPanelProps {
   activeTab: OutputTab;

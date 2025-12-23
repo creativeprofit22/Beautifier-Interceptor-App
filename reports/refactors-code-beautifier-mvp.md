@@ -21,10 +21,10 @@ Files analyzed:
 | 1 | page.tsx:432-436 | `BeautifyResponse` interface defined inside function body | Move to module level or shared types file | S | ✅ Done |
 | 2 | page.tsx:325-351 | `apiCall` utility defined inline in component file | Move to `lib/api.ts` for reuse across routes | S | ✅ Done |
 
-## Low Priority (Nice-to-Have)
-| # | Location | Issue | Suggested Fix | Effort |
-|---|----------|-------|---------------|--------|
-| 1 | page.tsx:20-116 | 6 small UI components in main file | Could extract to `components/ui/` but not blocking | M |
+## Low Priority (Nice-to-Have) ✅ COMPLETED
+| # | Location | Issue | Suggested Fix | Effort | Status |
+|---|----------|-------|---------------|--------|--------|
+| 1 | page.tsx:20-116 | 6 small UI components in main file | Could extract to `components/ui/` but not blocking | M | ✅ Done |
 
 ## Summary
 - High: 2 refactors (2 Small)
