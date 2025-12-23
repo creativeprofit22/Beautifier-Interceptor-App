@@ -9,26 +9,25 @@ Files analyzed:
 - src/app/page.tsx
 - src/app/api/beautify/route.ts
 
-## High Priority (Tech Debt / DRY)
-| # | Location | Issue | Suggested Fix | Effort |
-|---|----------|-------|---------------|--------|
-| - | - | No high priority refactors found | - | - |
-
-## Medium Priority (Code Clarity)
+## High Priority (Tech Debt / DRY) ✅ COMPLETED
 | # | Location | Issue | Suggested Fix | Effort | Status |
 |---|----------|-------|---------------|--------|--------|
-| 1 | page.tsx:159-192 | Nested ternary for output states (loading/result/empty) reduces readability | Extract to `OutputContent` component with explicit conditionals | S | ✅ Done |
-| 2 | page.tsx:28-220 | Home component is 190+ lines with mixed concerns | Extract error banner and button sections to reduce cognitive load | M | ✅ Done |
+| 1 | page.tsx:453,480 | Duplicate error extraction `err instanceof Error ? err.message : "An error occurred"` | Extract to helper `getErrorMessage(err: unknown): string` | S | ✅ Done |
+| 2 | route.ts:7-8 | `MAX_CODE_SIZE` and `TIMEOUT_MS` duplicated from lib/claude.ts | Import from lib/claude.ts instead of redefining | S | ✅ Done |
+
+## Medium Priority (Code Clarity) ✅ COMPLETED
+| # | Location | Issue | Suggested Fix | Effort | Status |
+|---|----------|-------|---------------|--------|--------|
+| 1 | page.tsx:432-436 | `BeautifyResponse` interface defined inside function body | Move to module level or shared types file | S | ✅ Done |
+| 2 | page.tsx:325-351 | `apiCall` utility defined inline in component file | Move to `lib/api.ts` for reuse across routes | S | ✅ Done |
 
 ## Low Priority (Nice-to-Have)
-| # | Location | Issue | Suggested Fix | Effort | Status |
-|---|----------|-------|---------------|--------|--------|
-| 1 | page.tsx:103-114 | Error banner is inline JSX, could be reused | Extract `ErrorBanner` component with onDismiss prop | S | ✅ Done (via Medium #2) |
-| 2 | page.tsx:72-87 | Copy-to-clipboard with feedback state is common pattern | Extract `useClipboard` hook for reusability | S | ✅ Done |
-| 3 | route.ts:7-15 | BEAUTIFY_PROMPT embedded in route file | Move to `lib/prompts.ts` if more prompts added later | S | ✅ Done |
+| # | Location | Issue | Suggested Fix | Effort |
+|---|----------|-------|---------------|--------|
+| 1 | page.tsx:20-116 | 6 small UI components in main file | Could extract to `components/ui/` but not blocking | M |
 
 ## Summary
-- High: 0 refactors
-- Medium: 2 refactors (1 Small, 1 Medium) ✅ Complete
-- Low: 3 refactors ✅ Complete
-- Total: 5 refactors ✅ All complete
+- High: 2 refactors (2 Small)
+- Medium: 2 refactors (2 Small)
+- Low: 1 refactor (1 Medium)
+- Total: 5 refactors

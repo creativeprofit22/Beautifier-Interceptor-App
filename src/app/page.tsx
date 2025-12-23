@@ -5,8 +5,19 @@ import { Copy, Check, Sparkles, Loader2, X, MessageSquareText } from "lucide-rea
 import { Highlight, themes } from "prism-react-renderer";
 import ReactMarkdown from "react-markdown";
 import { useClipboard } from "@/hooks/useClipboard";
+import { apiCall } from "@/lib/api";
 
 type OutputTab = "code" | "explanation";
+
+interface BeautifyResponse {
+  result: string;
+  sourceMapDetected?: boolean;
+  externalSourceMapUrl?: string | null;
+}
+
+function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : "An error occurred";
+}
 
 // 220px = header (73px) + main padding (48px) + error banner space (55px) + button area (44px)
 const PANEL_HEIGHT = "h-[calc(100vh-220px)]";
@@ -322,34 +333,6 @@ function ExplanationContent({ isLoading, explanation }: ExplanationContentProps)
   );
 }
 
-async function apiCall<T>(
-  url: string,
-  body: object,
-  resultField: string | null,
-  errorMessage: string
-): Promise<T> {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-
-  const data = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    throw new Error(data?.error || errorMessage);
-  }
-
-  if (resultField !== null) {
-    if (!data?.[resultField]) {
-      throw new Error("Invalid response from server");
-    }
-    return data[resultField];
-  }
-
-  return data;
-}
-
 function useBeautifyState() {
   const [inputCode, setInputCode] = useState("");
   const [outputCode, setOutputCode] = useState("");
@@ -429,12 +412,6 @@ export default function Home() {
     setExternalSourceMapUrl(null);
 
     try {
-      interface BeautifyResponse {
-        result: string;
-        sourceMapDetected?: boolean;
-        externalSourceMapUrl?: string | null;
-      }
-
       const data = await apiCall<BeautifyResponse>(
         "/api/beautify",
         { code: inputCode },
@@ -450,7 +427,7 @@ export default function Home() {
       setSourceMapDetected(data.sourceMapDetected ?? false);
       setExternalSourceMapUrl(data.externalSourceMapUrl ?? null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -477,7 +454,7 @@ export default function Home() {
       );
       setExplanation(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(getErrorMessage(err));
       setActiveTab("code");
     } finally {
       setIsExplaining(false);

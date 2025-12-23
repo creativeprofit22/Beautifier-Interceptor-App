@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBeautifyPrompt } from "@/lib/prompts";
-import { runClaudeCommand } from "@/lib/claude";
+import { runClaudeCommand, MAX_CODE_SIZE, TIMEOUT_MS } from "@/lib/claude";
 import { processCodeWithSourceMap } from "@/lib/source-map";
 import { stripMarkdownFences } from "@/lib/utils";
-
-const MAX_CODE_SIZE = 100 * 1024; // 100KB limit
-const TIMEOUT_MS = 120 * 1000; // 2 minute timeout
 
 export async function POST(request: NextRequest) {
   let body;

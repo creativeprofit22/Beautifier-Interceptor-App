@@ -9,24 +9,24 @@ Files analyzed:
 - src/app/api/beautify/route.ts
 
 ## High Priority
-| # | Location | Description | Impact |
+| # | Location | Description | Status |
 |---|----------|-------------|--------|
-| 1 | route.ts:54 | Rejected promise from timeout case is never handled - when `killed=true` the close handler returns early but the rejection from line 37 is already queued | Unhandled promise rejection warning in Node.js |
+| 1 | lib/claude.ts | Rejected promise from timeout case is never handled | ✅ Fixed - `settle` flag pattern prevents double-settlement |
 
 ## Medium Priority
-| # | Location | Description | Impact |
+| # | Location | Description | Status |
 |---|----------|-------------|--------|
-| 1 | page.tsx:54-56 | If `response.json()` fails (invalid JSON), the error thrown will be generic, not the actual parse error | Confusing error messages when API returns malformed response |
-| 2 | route.ts:19 | Regex pattern doesn't handle code fences without newline after opening fence (e.g., ` ```javascript// code`) | Some Claude outputs may not be properly stripped |
+| 1 | page.tsx | If `response.json()` fails, error is generic | ✅ Fixed - `apiCall` helper catches parse failures |
+| 2 | lib/utils.ts | Regex doesn't handle code fences without newline | ✅ Fixed - uses `[\w-]*` for any language |
 
 ## Low Priority
-| # | Location | Description | Impact |
+| # | Location | Description | Status |
 |---|----------|-------------|--------|
-| 1 | page.tsx:55 | Reading response body twice - first `.json()` for error, then again on line 59 for success | Inefficient; body can only be read once so this works, but is confusing |
-| 2 | route.ts:70 | `request.json()` can throw if body is not valid JSON, but error message will be generic | Users see "Failed to beautify code" instead of "Invalid request body" |
+| 1 | page.tsx | Reading response body twice | ✅ Fixed - `apiCall` reads body once with `.catch(() => null)` |
+| 2 | route.ts | `request.json()` error gives generic message | ✅ Fixed - try/catch with "Invalid request body" error |
 
 ## Summary
-- High: 1 bug
-- Medium: 2 bugs
-- Low: 2 bugs
-- Total: 5 bugs
+- High: 0 remaining (1 fixed)
+- Medium: 0 remaining (2 fixed)
+- Low: 0 remaining (2 fixed)
+- Total: 5 bugs fixed, 0 remaining
