@@ -1,21 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Download, FileCode } from "lucide-react";
+import { Copy, Check, Download, FileCode, Save } from "lucide-react";
 import { Highlight, themes } from "prism-react-renderer";
+import { useSaveInsight } from "../hooks/useSaveInsight";
+import { ActionButton } from "@/components/ui/ActionButton";
 
 interface OpenApiViewerProps {
   spec: string;
+  sessionId?: string;
   title?: string;
   onDownload?: () => void;
 }
 
 export function OpenApiViewer({
   spec,
+  sessionId,
   title = "OpenAPI Specification",
   onDownload,
 }: OpenApiViewerProps) {
   const [copied, setCopied] = useState(false);
+  const { isSaving, saveInsight } = useSaveInsight({
+    type: "openapi",
+    successMessage: "OpenAPI spec saved",
+  });
 
   const handleCopy = async () => {
     try {
@@ -43,6 +51,22 @@ export function OpenApiViewer({
     }
   };
 
+  const handleSave = () => {
+    // Parse spec if it's YAML/JSON string
+    let specData: unknown;
+    try {
+      specData = JSON.parse(spec);
+    } catch {
+      // If not valid JSON, store as raw string
+      specData = { raw: spec, format: "yaml" };
+    }
+
+    saveInsight(sessionId, {
+      generatedAt: new Date().toISOString(),
+      spec: specData,
+    });
+  };
+
   if (!spec) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900">
@@ -62,29 +86,30 @@ export function OpenApiViewer({
           <span className="text-sm font-medium text-zinc-400">{title}</span>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          {sessionId && (
+            <ActionButton
+              onClick={handleSave}
+              disabled={isSaving}
+              icon={<Save className="h-3.5 w-3.5" />}
+              label="Save"
+              isLoading={isSaving}
+              loadingLabel="Saving..."
+            />
+          )}
+          <ActionButton
             onClick={handleDownload}
-            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
-          >
-            <Download className="h-3.5 w-3.5" />
-            <span>Download</span>
-          </button>
-          <button
+            icon={<Download className="h-3.5 w-3.5" />}
+            label="Download"
+          />
+          <ActionButton
             onClick={handleCopy}
-            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
-          >
-            {copied ? (
-              <>
-                <Check className="h-3.5 w-3.5 text-green-500" />
-                <span className="text-green-500">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-3.5 w-3.5" />
-                <span>Copy</span>
-              </>
-            )}
-          </button>
+            icon={<Copy className="h-3.5 w-3.5" />}
+            label="Copy"
+            isActive={copied}
+            activeIcon={<Check className="h-3.5 w-3.5 text-green-500" />}
+            activeLabel="Copied!"
+            activeClassName="text-green-500"
+          />
         </div>
       </div>
 

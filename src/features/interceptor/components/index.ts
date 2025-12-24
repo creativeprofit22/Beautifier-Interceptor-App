@@ -12,3 +12,5 @@ export type { Finding, SeverityLevel } from "./ScanResults";
 export { OpenApiViewer } from "./OpenApiViewer";
 
 export { InterceptorChat } from "./InterceptorChat";
+
+export { SavedInsights } from "./SavedInsights";

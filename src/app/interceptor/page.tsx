@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Radio, Shield, FileCode, Terminal, MessageSquare } from "lucide-react";
+import { Radio, Shield, FileCode, Terminal, MessageSquare, Database } from "lucide-react";
 import { TabButton } from "@/components/ui/TabButton";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -16,9 +16,10 @@ import {
   Finding,
   OpenApiViewer,
   InterceptorChat,
+  SavedInsights,
 } from "@/features/interceptor/components";
 
-type Tab = "sessions" | "scan" | "openapi" | "chat";
+type Tab = "sessions" | "scan" | "openapi" | "chat" | "saved";
 
 // API response types
 interface SessionsResponse {
@@ -275,7 +276,7 @@ export default function InterceptorPage() {
         </button>
       </div>
 
-      {scanResults.length > 0 && <ScanResults findings={scanResults} />}
+      {scanResults.length > 0 && <ScanResults findings={scanResults} sessionId={scanSessionId} />}
 
       {scanResults.length === 0 && !isLoading && (
         <EmptyState
@@ -321,7 +322,7 @@ export default function InterceptorPage() {
         </button>
       </div>
 
-      {openApiSpec && <OpenApiViewer spec={openApiSpec} />}
+      {openApiSpec && <OpenApiViewer spec={openApiSpec} sessionId={openApiSessionId} />}
 
       {!openApiSpec && !isLoading && (
         <EmptyState
@@ -383,6 +384,12 @@ export default function InterceptorPage() {
               isActive={activeTab === "chat"}
               onClick={() => setActiveTab("chat")}
             />
+            <TabButton
+              label="Saved"
+              icon={Database}
+              isActive={activeTab === "saved"}
+              onClick={() => setActiveTab("saved")}
+            />
           </div>
 
           {/* Tab Content */}
@@ -391,6 +398,7 @@ export default function InterceptorPage() {
             {activeTab === "scan" && renderScanTab()}
             {activeTab === "openapi" && renderOpenApiTab()}
             {activeTab === "chat" && <InterceptorChat />}
+            {activeTab === "saved" && <SavedInsights />}
           </div>
         </div>
       </main>

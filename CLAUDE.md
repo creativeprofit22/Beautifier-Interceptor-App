@@ -1,35 +1,36 @@
-# Code Beautifier
+# Beautifier-Interceptor-App
 
-Local web app that beautifies/deobfuscates JavaScript using Claude CLI.
+Next.js app combining code beautifier with integrated Interceptor Toolkit for HTTP traffic capture and API analysis.
 
 ## Current Focus
-Section: Interceptor Chat Assistant
+Section: Insights Storage
 Files:
-- src/lib/chat-agent.ts
-- src/app/api/interceptor/chat/route.ts
-- src/features/interceptor/components/InterceptorChat.tsx
-- src/features/interceptor/components/chat/ChatInput.tsx
-- src/features/interceptor/components/chat/MessageBubble.tsx
-- src/features/interceptor/components/chat/TypingIndicator.tsx
+- src/app/api/interceptor/insights/route.ts
+- src/app/api/interceptor/insights/[id]/route.ts
+- src/features/interceptor/components/SavedInsights.tsx
 - src/features/interceptor/components/ScanResults.tsx
+- src/features/interceptor/components/OpenApiViewer.tsx
 
 ## Pipeline State
 Phase: refactoring
-Feature: Interceptor Chat Assistant
+Feature: Insights Storage
 Tier: low
 Tier-Status: pending
 Reports:
-  - bugs: reports/bugs-interceptor-chat.md
-  - refactors: reports/refactors-interceptor-chat.md
+  - bugs: reports/bugs-insights-storage.md
+  - refactors: reports/refactors-insights-storage.md
 
 ## Last Session (2025-12-23)
-- Completed medium priority refactors (4/4):
-  - Extracted `buildPrompt()` helper in chat-agent.ts
-  - Extracted `extractJsonFromResponse()` helper in chat-agent.ts
-  - Extracted `getSessionId(action)` helper in route.ts
-  - Consolidated `SEVERITY_CONFIG` in ScanResults.tsx
-- TypeScript verification passing
-- Updated refactor report with completed status
+- Executed medium priority refactors (2/2 complete):
+  - Created `useSaveInsight` custom hook at `src/features/interceptor/hooks/useSaveInsight.ts`
+  - Refactored ScanResults.tsx and OpenApiViewer.tsx to use the shared hook
+  - Fixed `getSummary()` duplicate call in SavedInsights.tsx (now stores in variable)
+- TypeScript compiles clean
+- Updated refactor report to mark medium tier complete
+
+## Next Steps
+1. Execute low priority refactors
+2. Test saving/viewing insights in UI
 
 ## Tech Stack
 Next.js 16.1, React 19, TypeScript 5, Tailwind 4, Prisma 7, tRPC 11

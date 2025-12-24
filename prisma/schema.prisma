@@ -54,3 +54,15 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+// Interceptor Toolkit - Stored Insights
+model Insight {
+  id        String   @id @default(cuid())
+  sessionId String   // Reference to file-based capture session
+  type      String   // "scan" | "openapi" | "patterns"
+  data      Json     // Full result data
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([type])
+}
