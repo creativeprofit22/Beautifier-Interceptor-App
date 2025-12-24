@@ -24,16 +24,16 @@ A Next.js application for code formatting and syntax highlighting, with an integ
 
 **Option 1: One-command setup**
 ```bash
-git clone https://github.com/creativeprofit22/code-beautifier.git
-cd code-beautifier
+git clone https://github.com/creativeprofit22/Beautifier-Interceptor-App.git
+cd Beautifier-Interceptor-App
 npm run setup
 ```
 
 **Option 2: Manual setup**
 ```bash
 # Clone the repository
-git clone https://github.com/creativeprofit22/code-beautifier.git
-cd code-beautifier
+git clone https://github.com/creativeprofit22/Beautifier-Interceptor-App.git
+cd Beautifier-Interceptor-App
 
 # Install dependencies
 npm install
