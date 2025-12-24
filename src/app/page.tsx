@@ -304,14 +304,6 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-950 font-sans text-zinc-100">
-      {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center gap-3">
-          <Sparkles className="h-6 w-6 text-violet-500" />
-          <h1 className="text-2xl font-bold tracking-tight">Code Beautifier</h1>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="flex flex-1 flex-col gap-4 p-6">
         <div className="mx-auto w-full max-w-7xl flex-1">

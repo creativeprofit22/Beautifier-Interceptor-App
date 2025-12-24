@@ -32,6 +32,7 @@
     "@trpc/react-query": "^11.8.1",
     "@trpc/server": "^11.8.1",
     "class-variance-authority": "^0.7.1",
+    "claude-rag": "file:../wsl-documents/Claude-RAG",
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
     "next": "16.1.0",

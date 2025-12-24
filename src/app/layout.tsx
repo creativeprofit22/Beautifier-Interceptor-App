@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TRPCProvider } from "@/trpc/client";
+import { NavHeader } from "@/components/NavHeader";
+import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,8 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <TRPCProvider>{children}</TRPCProvider>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950`}>
+        <TRPCProvider>
+          <ToastProvider>
+            <NavHeader />
+            {children}
+          </ToastProvider>
+        </TRPCProvider>
       </body>
     </html>
   );
