@@ -11,7 +11,14 @@ const MAX_HISTORY_MESSAGES = 6;
 const CLAUDE_TIMEOUT_MS = 60000;
 
 export interface ChatAction {
-  type: "listSessions" | "showSession" | "startCapture" | "runScan" | "generateOpenAPI" | "runMock" | "analyze";
+  type:
+    | "listSessions"
+    | "showSession"
+    | "startCapture"
+    | "runScan"
+    | "generateOpenAPI"
+    | "runMock"
+    | "analyze";
   params?: Record<string, unknown>;
 }
 
@@ -92,7 +99,8 @@ export async function sendChatMessage(
   const isAvailable = await checkClaudeCodeAvailable();
   if (!isAvailable) {
     return {
-      message: "Claude Code CLI is not installed. Please install it with: npm install -g @anthropic-ai/claude-code",
+      message:
+        "Claude Code CLI is not installed. Please install it with: npm install -g @anthropic-ai/claude-code",
       error: "cli_not_found",
     };
   }

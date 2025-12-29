@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import {
-  Finding,
-  SeverityLevel,
-  SEVERITY_CONFIG,
-  SeverityIcon,
-  FindingCard,
-} from "./FindingCard";
+import { Finding, SeverityLevel, SEVERITY_CONFIG, SeverityIcon, FindingCard } from "./FindingCard";
 
 interface SeverityGroupProps {
   severity: SeverityLevel;
@@ -16,11 +10,7 @@ interface SeverityGroupProps {
   defaultExpanded?: boolean;
 }
 
-export function SeverityGroup({
-  severity,
-  findings,
-  defaultExpanded = false,
-}: SeverityGroupProps) {
+export function SeverityGroup({ severity, findings, defaultExpanded = false }: SeverityGroupProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   if (findings.length === 0) return null;

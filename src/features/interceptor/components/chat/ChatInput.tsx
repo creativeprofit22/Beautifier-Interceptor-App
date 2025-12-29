@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useRef, KeyboardEvent } from 'react';
-import { Send } from 'lucide-react';
+import { useState, useRef, KeyboardEvent } from "react";
+import { Send } from "lucide-react";
 
 export interface ChatInputProps {
   placeholder?: string;
@@ -11,24 +11,24 @@ export interface ChatInputProps {
 }
 
 export function ChatInput({
-  placeholder = 'Ask a question...',
-  accentColor = '#6366f1',
+  placeholder = "Ask a question...",
+  accentColor = "#6366f1",
   onSendMessage,
   disabled = false,
 }: ChatInputProps) {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSend = () => {
     if (!inputValue.trim() || !onSendMessage || disabled) return;
 
     onSendMessage(inputValue.trim());
-    setInputValue('');
+    setInputValue("");
     inputRef.current?.focus();
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }

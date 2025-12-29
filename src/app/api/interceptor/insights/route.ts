@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type");
 
     // Validate type if provided
-    if (type && !VALID_INSIGHT_TYPES.includes(type as typeof VALID_INSIGHT_TYPES[number])) {
+    if (type && !VALID_INSIGHT_TYPES.includes(type as (typeof VALID_INSIGHT_TYPES)[number])) {
       return NextResponse.json(
         { error: `Invalid type. Must be one of: ${VALID_INSIGHT_TYPES.join(", ")}` },
         { status: 400 }
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "type is required" }, { status: 400 });
     }
 
-    if (!VALID_INSIGHT_TYPES.includes(type as typeof VALID_INSIGHT_TYPES[number])) {
+    if (!VALID_INSIGHT_TYPES.includes(type as (typeof VALID_INSIGHT_TYPES)[number])) {
       return NextResponse.json(
         { error: `Invalid type. Must be one of: ${VALID_INSIGHT_TYPES.join(", ")}` },
         { status: 400 }
@@ -80,7 +80,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!data || typeof data !== "object" || data === null || Array.isArray(data)) {
-      return NextResponse.json({ error: "data is required and must be a non-null object" }, { status: 400 });
+      return NextResponse.json(
+        { error: "data is required and must be a non-null object" },
+        { status: 400 }
+      );
     }
 
     const insight = await prisma.insight.create({

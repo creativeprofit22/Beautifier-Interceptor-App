@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sparkles, Radio } from "lucide-react";
+import { Sparkles, Radio, Smartphone } from "lucide-react";
 
 interface NavLinkProps {
   href: string;
@@ -45,6 +45,12 @@ export function NavHeader() {
             icon={<Radio className="h-4 w-4" />}
             label="Interceptor"
             isActive={pathname === "/interceptor"}
+          />
+          <NavLink
+            href="/android-re"
+            icon={<Smartphone className="h-4 w-4" />}
+            label="Android RE"
+            isActive={pathname === "/android-re"}
           />
         </nav>
       </div>

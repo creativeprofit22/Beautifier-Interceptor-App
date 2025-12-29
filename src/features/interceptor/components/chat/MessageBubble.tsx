@@ -1,29 +1,28 @@
-'use client';
+"use client";
 
-import type { ChatMessage } from './types';
+import type { ChatMessage } from "./types";
 
 interface MessageBubbleProps {
   message: ChatMessage;
   accentColor?: string;
 }
 
-export function MessageBubble({
-  message,
-  accentColor = '#6366f1',
-}: MessageBubbleProps) {
-  const isUser = message.role === 'user';
+export function MessageBubble({ message, accentColor = "#6366f1" }: MessageBubbleProps) {
+  const isUser = message.role === "user";
 
-  const time = message.timestamp.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
+  const time = message.timestamp.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
   return (
-    <div className={`rag-message ${isUser ? 'rag-message-user' : 'rag-message-assistant'}`}>
-      <div className={`rag-message-content ${isUser ? 'rag-message-content-user' : 'rag-message-content-assistant'}`}>
+    <div className={`rag-message ${isUser ? "rag-message-user" : "rag-message-assistant"}`}>
+      <div
+        className={`rag-message-content ${isUser ? "rag-message-content-user" : "rag-message-content-assistant"}`}
+      >
         {/* Message bubble */}
         <div
-          className={`rag-message-bubble ${isUser ? 'rag-message-bubble-user' : 'rag-message-bubble-assistant'}`}
+          className={`rag-message-bubble ${isUser ? "rag-message-bubble-user" : "rag-message-bubble-assistant"}`}
           style={
             isUser
               ? {

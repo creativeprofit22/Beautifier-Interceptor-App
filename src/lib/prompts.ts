@@ -8,7 +8,8 @@ RULES:
 
 CRITICAL: Your response must start with code and contain ONLY code. Never ask questions or add explanations.`;
 
-const VARIABLE_MAPPING_FORMAT = (minified: string, original: string) => `- ${minified} → ${original}`;
+const VARIABLE_MAPPING_FORMAT = (minified: string, original: string) =>
+  `- ${minified} → ${original}`;
 
 /**
  * Get the beautify prompt with optional source map variable hints
@@ -22,7 +23,7 @@ export function getBeautifyPrompt(variableHints?: Record<string, string>): strin
 
   const mappingLines = Object.entries(variableHints)
     .map(([minified, original]) => VARIABLE_MAPPING_FORMAT(minified, original))
-    .join('\n');
+    .join("\n");
 
   return `${BEAUTIFY_PROMPT}
 

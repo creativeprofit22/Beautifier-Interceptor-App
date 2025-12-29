@@ -21,7 +21,8 @@ export interface SourceMapResult {
 export function detectSourceMapUrl(code: string): string | null {
   // Match JS-style (//# sourceMappingURL=...) and CSS-style (/*# sourceMappingURL=... */)
   // CSS pattern uses negative lookahead to exclude closing */ while allowing * in URLs
-  const regex = /(?:\/\/[#@] ?sourceMappingURL=([^\s'"]+)|\/\*[#@] ?sourceMappingURL=((?:[^\s'"*]|\*(?!\/))+) ?\*\/)\s*$/gm;
+  const regex =
+    /(?:\/\/[#@] ?sourceMappingURL=([^\s'"]+)|\/\*[#@] ?sourceMappingURL=((?:[^\s'"*]|\*(?!\/))+) ?\*\/)\s*$/gm;
   let match: RegExpExecArray | null;
   let lastMatch: string | null = null;
 

@@ -105,11 +105,11 @@ export function InterceptorChat() {
   };
 
   return (
-    <div className="flex flex-col h-[600px] rounded-lg border border-zinc-800 bg-zinc-900/80 overflow-hidden">
+    <div className="flex h-[600px] flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/80">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-900">
+      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-violet-500/10">
+          <div className="rounded-lg bg-violet-500/10 p-1.5">
             <Sparkles className="h-4 w-4 text-violet-400" />
           </div>
           <div>
@@ -120,14 +120,14 @@ export function InterceptorChat() {
         <div className="flex items-center gap-3">
           <button
             onClick={handleExportChat}
-            className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
           >
             <Download className="h-3 w-3" />
             Export
           </button>
           <button
             onClick={handleClearChat}
-            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="text-xs text-zinc-500 transition-colors hover:text-zinc-300"
           >
             Clear
           </button>
@@ -135,13 +135,9 @@ export function InterceptorChat() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            accentColor={ACCENT_COLOR}
-          />
+          <MessageBubble key={message.id} message={message} accentColor={ACCENT_COLOR} />
         ))}
         {isTyping && <TypingIndicator accentColor={ACCENT_COLOR} />}
         <div ref={messagesEndRef} />

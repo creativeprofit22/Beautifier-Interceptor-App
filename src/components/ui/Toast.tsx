@@ -49,7 +49,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 
   return (
     <div
-      className={`flex items-center gap-3 rounded-lg border px-4 py-3 shadow-lg backdrop-blur-sm animate-in slide-in-from-right-full ${styles[toast.type]}`}
+      className={`animate-in slide-in-from-right-full flex items-center gap-3 rounded-lg border px-4 py-3 shadow-lg backdrop-blur-sm ${styles[toast.type]}`}
     >
       <Icon className="h-5 w-5 flex-shrink-0" />
       <span className="flex-1 text-sm">{toast.message}</span>
@@ -79,7 +79,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <div className="fixed right-4 bottom-4 z-50 flex flex-col gap-2">
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onDismiss={() => dismissToast(toast.id)} />
         ))}

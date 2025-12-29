@@ -99,18 +99,12 @@ function InsightCard({
           <Icon className={`h-5 w-5 ${config.color}`} />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-zinc-200">
-                {config.label}
-              </span>
-              <span className="text-xs text-zinc-500">
-                Session: {insight.sessionId}
-              </span>
+              <span className="text-sm font-medium text-zinc-200">{config.label}</span>
+              <span className="text-xs text-zinc-500">Session: {insight.sessionId}</span>
             </div>
             {(() => {
               const summary = getSummary();
-              return summary && (
-                <p className="text-xs text-zinc-400 mt-0.5">{summary}</p>
-              );
+              return summary && <p className="mt-0.5 text-xs text-zinc-400">{summary}</p>;
             })()}
           </div>
           <span className="text-xs text-zinc-500">{formattedDate}</span>
@@ -150,9 +144,8 @@ export function SavedInsights(_props: SavedInsightsProps) {
   const fetchInsights = async () => {
     setIsLoading(true);
     try {
-      const url = filter === "all"
-        ? "/api/interceptor/insights"
-        : `/api/interceptor/insights?type=${filter}`;
+      const url =
+        filter === "all" ? "/api/interceptor/insights" : `/api/interceptor/insights?type=${filter}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch");
       const data = await response.json();

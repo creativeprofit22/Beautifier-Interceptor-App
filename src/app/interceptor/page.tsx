@@ -197,9 +197,7 @@ export default function InterceptorPage() {
 
       if (result.spec) {
         setOpenApiSpec(
-          typeof result.spec === "string"
-            ? result.spec
-            : JSON.stringify(result.spec, null, 2)
+          typeof result.spec === "string" ? result.spec : JSON.stringify(result.spec, null, 2)
         );
         showToast("OpenAPI spec generated", "success");
       }
@@ -234,11 +232,7 @@ export default function InterceptorPage() {
     }
 
     return (
-      <SessionList
-        sessions={sessions}
-        onView={handleViewSession}
-        onDelete={handleDeleteSession}
-      />
+      <SessionList sessions={sessions} onView={handleViewSession} onDelete={handleDeleteSession} />
     );
   };
 
@@ -248,7 +242,7 @@ export default function InterceptorPage() {
         <select
           value={scanSessionId}
           onChange={(e) => setScanSessionId(e.target.value)}
-          className="min-w-[200px] rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-zinc-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+          className="min-w-[200px] rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-zinc-100 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
         >
           <option value="">Select a session...</option>
           {sessions.map((session) => (
@@ -294,7 +288,7 @@ export default function InterceptorPage() {
         <select
           value={openApiSessionId}
           onChange={(e) => setOpenApiSessionId(e.target.value)}
-          className="min-w-[200px] rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-zinc-100 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+          className="min-w-[200px] rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-zinc-100 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none"
         >
           <option value="">Select a session...</option>
           {sessions.map((session) => (
@@ -340,19 +334,23 @@ export default function InterceptorPage() {
         <div className="mx-auto w-full max-w-7xl flex-1">
           {/* Page Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="mb-2 flex items-center gap-3">
               <div className="rounded-lg bg-violet-500/10 p-2">
                 <Radio className="h-6 w-6 text-violet-400" />
               </div>
               <h1 className="text-2xl font-bold text-zinc-100">Traffic Interceptor</h1>
             </div>
-            <p className="text-zinc-500 max-w-2xl">
-              View captured HTTP sessions, run security scans, and generate OpenAPI documentation from your traffic.
+            <p className="max-w-2xl text-zinc-500">
+              View captured HTTP sessions, run security scans, and generate OpenAPI documentation
+              from your traffic.
             </p>
-            <div className="mt-4 flex items-center gap-2 rounded-lg bg-zinc-900/50 border border-zinc-800 px-4 py-3">
+            <div className="mt-4 flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3">
               <Terminal className="h-4 w-4 text-zinc-500" />
               <code className="text-xs text-zinc-400">
-                Start capture: <span className="text-violet-400">interceptor capture --mode passive --port 8888</span>
+                Start capture:{" "}
+                <span className="text-violet-400">
+                  interceptor capture --mode passive --port 8888
+                </span>
               </code>
             </div>
           </div>

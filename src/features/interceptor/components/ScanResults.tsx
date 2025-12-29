@@ -36,11 +36,7 @@ function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-function buildScanReport(
-  findings: Finding[],
-  scanTime?: Date,
-  duration?: number
-): ScanReport {
+function buildScanReport(findings: Finding[], scanTime?: Date, duration?: number): ScanReport {
   return {
     generatedAt: new Date().toISOString(),
     scanTime: scanTime?.toISOString(),

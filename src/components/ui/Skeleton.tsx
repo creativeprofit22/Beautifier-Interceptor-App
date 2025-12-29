@@ -1,10 +1,5 @@
 export function Skeleton({ className = "" }: { className?: string }) {
-  return (
-    <div
-      className={`animate-pulse rounded-md bg-zinc-800 ${className}`}
-      aria-hidden="true"
-    />
-  );
+  return <div className={`animate-pulse rounded-md bg-zinc-800 ${className}`} aria-hidden="true" />;
 }
 
 export function SessionListSkeleton() {

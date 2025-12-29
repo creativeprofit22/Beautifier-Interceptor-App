@@ -61,7 +61,9 @@ export function SeverityIcon({ severity }: { severity: SeverityLevel }) {
 
 export function SeverityBadge({ severity }: { severity: SeverityLevel }) {
   return (
-    <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${SEVERITY_CONFIG[severity].badgeClass}`}>
+    <span
+      className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${SEVERITY_CONFIG[severity].badgeClass}`}
+    >
       {severity}
     </span>
   );

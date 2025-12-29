@@ -22,10 +22,7 @@ export function useSaveInsight({
   const [isSaving, setIsSaving] = useState(false);
   const { showToast } = useToast();
 
-  const saveInsight = async (
-    sessionId: string | undefined,
-    data: unknown
-  ): Promise<boolean> => {
+  const saveInsight = async (sessionId: string | undefined, data: unknown): Promise<boolean> => {
     if (!sessionId) {
       showToast("Session ID required to save", "error");
       return false;

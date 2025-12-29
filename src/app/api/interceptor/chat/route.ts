@@ -17,7 +17,9 @@ function getSessionId(action: ChatAction): string {
 /**
  * Execute an action returned by the chat agent
  */
-async function executeAction(action: ChatAction): Promise<{ success: boolean; data?: unknown; error?: string }> {
+async function executeAction(
+  action: ChatAction
+): Promise<{ success: boolean; data?: unknown; error?: string }> {
   try {
     switch (action.type) {
       case "listSessions": {
@@ -26,7 +28,12 @@ async function executeAction(action: ChatAction): Promise<{ success: boolean; da
       }
 
       case "showSession": {
-        const result = await runInterceptorCommand(["sessions", "show", getSessionId(action), "--json"]);
+        const result = await runInterceptorCommand([
+          "sessions",
+          "show",
+          getSessionId(action),
+          "--json",
+        ]);
         return { success: result.success, data: result.data, error: result.error };
       }
 
@@ -45,7 +52,14 @@ async function executeAction(action: ChatAction): Promise<{ success: boolean; da
 
       case "analyze": {
         const task = (action.params?.task as string) || "summarize";
-        const result = await runInterceptorCommand(["analyze", "--session", getSessionId(action), "--task", task, "--json"]);
+        const result = await runInterceptorCommand([
+          "analyze",
+          "--session",
+          getSessionId(action),
+          "--task",
+          task,
+          "--json",
+        ]);
         return { success: result.success, data: result.data, error: result.error };
       }
 
@@ -60,7 +74,7 @@ async function executeAction(action: ChatAction): Promise<{ success: boolean; da
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Action execution failed"
+      error: error instanceof Error ? error.message : "Action execution failed",
     };
   }
 }
@@ -68,7 +82,10 @@ async function executeAction(action: ChatAction): Promise<{ success: boolean; da
 /**
  * Format action results for display
  */
-function formatActionResult(action: ChatAction, result: { success: boolean; data?: unknown; error?: string }): string {
+function formatActionResult(
+  action: ChatAction,
+  result: { success: boolean; data?: unknown; error?: string }
+): string {
   if (!result.success) {
     return `\n\n**Error:** ${result.error || "Action failed"}`;
   }
@@ -82,14 +99,22 @@ function formatActionResult(action: ChatAction, result: { success: boolean; data
       if (sessions.length === 0) {
         return "\n\n*No sessions found. Start a capture first with:*\n`interceptor capture --mode passive --port 8080`";
       }
-      const list = sessions.map((s: { id?: string; name?: string; request_count?: number; created?: string }) =>
-        `- **${s.name || s.id}**: ${s.request_count || 0} requests (${s.created || "unknown date"})`
-      ).join("\n");
+      const list = sessions
+        .map(
+          (s: { id?: string; name?: string; request_count?: number; created?: string }) =>
+            `- **${s.name || s.id}**: ${s.request_count || 0} requests (${s.created || "unknown date"})`
+        )
+        .join("\n");
       return `\n\n${list}`;
     }
 
     case "showSession": {
-      const session = data as { id?: string; name?: string; request_count?: number; endpoints?: string[] };
+      const session = data as {
+        id?: string;
+        name?: string;
+        request_count?: number;
+        endpoints?: string[];
+      };
       return `\n\n**Session:** ${session.name || session.id}\n**Requests:** ${session.request_count || 0}\n**Endpoints:** ${(session.endpoints || []).slice(0, 5).join(", ")}${(session.endpoints?.length || 0) > 5 ? "..." : ""}`;
     }
 
@@ -99,7 +124,10 @@ function formatActionResult(action: ChatAction, result: { success: boolean; data
       if (vulns.length === 0) {
         return "\n\n*No vulnerabilities found.*";
       }
-      const list = vulns.slice(0, 5).map((v) => `- [${(v.severity ?? "UNKNOWN").toUpperCase()}] ${v.title ?? "Untitled"}`).join("\n");
+      const list = vulns
+        .slice(0, 5)
+        .map((v) => `- [${(v.severity ?? "UNKNOWN").toUpperCase()}] ${v.title ?? "Untitled"}`)
+        .join("\n");
       return `\n\n**Found ${vulns.length} vulnerabilities:**\n${list}${vulns.length > 5 ? `\n...and ${vulns.length - 5} more` : ""}`;
     }
 
